@@ -84,7 +84,7 @@ export const CustomModelDialog: React.FC<CustomModelDialogProps> = ({
                         <div className="flex items-start gap-2 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
                             <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
                             <p className="text-sm text-amber-900 dark:text-amber-100">
-                                <b>Note for Self-Hosting:</b> To add support for more models, you'll need to modify the <a href="https://github.com/kortix-ai/suna/blob/main/backend/services/llm.py" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600 underline">llm.py</a>, set the correct environment variables, and rebuild the application.
+                                <b>Note for Self-Hosting:</b> To add support for more models, you'll need to modify the <a href="https://github.com/omni-operator/omni-operator/blob/main/backend/services/llm.py" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600 underline">llm.py</a>, set the correct environment variables, and rebuild the application.
                             </p>
                         </div>
                     </DialogDescription>

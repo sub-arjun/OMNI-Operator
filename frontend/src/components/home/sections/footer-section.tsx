@@ -44,10 +44,10 @@ export function FooterSection() {
 
           <div className="flex items-center gap-4">
             <a
-              href="https://github.com/kortix-ai/suna"
+              href="https://github.com/omni-operator/omni-operator"
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="GitHub"
+              className="rounded-full border border-border bg-accent size-8 flex items-center justify-center hover:bg-accent/50 transition-colors duration-200"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
