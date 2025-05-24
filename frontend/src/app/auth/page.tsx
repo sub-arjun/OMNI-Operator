@@ -365,9 +365,9 @@ function LoginContent() {
                 </span>
               </Link>
 
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter text-center text-balance text-primary">
-                {isSignUp ? 'Join Suna' : 'Welcome back'}
-              </h1>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center">
+                {isSignUp ? 'Join OMNI Operator' : 'Welcome back'}
+              </h2>
               <p className="text-base md:text-lg text-center text-muted-foreground font-medium text-balance leading-relaxed tracking-tight mt-2 mb-6">
                 {isSignUp
                   ? 'Create your account and start building with AI'

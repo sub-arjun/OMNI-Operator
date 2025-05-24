@@ -68,10 +68,12 @@ export function CommandToolView({
   }, [assistantContent]);
 
   const command = rawCommand
-    ?.replace(/^suna@computer:~\$\s*/g, '')
-    ?.replace(/\\n/g, '')
-    ?.replace(/\n/g, '')
-    ?.trim();
+    ?.replace(/\\n/g, '\n')
+    ?.replace(/\\t/g, '\t')
+    ?.replace(/\\"/g, '"')
+    ?.replace(/\\\\/g, '\\')
+    ?.replace(/^omni@computer:~\$\s*/g, '')
+    ?.trim() || '';
 
   const output = React.useMemo(() => {
     if (!toolContent) return null;

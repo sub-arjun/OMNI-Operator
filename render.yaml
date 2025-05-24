@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: omni-operator-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    plan: starter
+    branch: main
+    healthCheckPath: /api/health
+    envVars:
+      - key: ENV_MODE
+        value: staging
+      - key: RABBITMQ_HOST
+        fromService:
+          type: pserv
+          name: rabbitmq
+          property: host
+      - key: RABBITMQ_PORT
+        value: "5672"
+      # Add all your other environment variables here
+      
+  - type: worker
+    name: omni-operator-worker
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    startCommand: python -m dramatiq run_agent_background
+    plan: starter
+    branch: main
+    envVars:
+      - key: ENV_MODE
+        value: staging
+      # Add the same environment variables as the web service 
