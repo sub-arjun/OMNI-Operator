@@ -952,24 +952,24 @@ export default function ThreadPage({
   // SEO title update
   useEffect(() => {
     if (projectName) {
-      // Update document title when project name changes
-      document.title = `${projectName} | Kortix Suna`;
+      // Update document title
+      document.title = `${projectName} | OMNI Operator`;
 
-      // Update meta tags for SEO
+      // Update meta tags
       const metaDescription = document.querySelector(
         'meta[name="description"]',
       );
       if (metaDescription) {
         metaDescription.setAttribute(
           'content',
-          `${projectName} - Interactive agent conversation powered by Kortix Suna`,
+          `${projectName} - Interactive agent conversation powered by OMNI Operator`,
         );
       }
 
-      // Update OpenGraph tags if they exist
+      // Update OpenGraph tags
       const ogTitle = document.querySelector('meta[property="og:title"]');
       if (ogTitle) {
-        ogTitle.setAttribute('content', `${projectName} | Kortix Suna`);
+        ogTitle.setAttribute('content', `${projectName} | OMNI Operator`);
       }
 
       const ogDescription = document.querySelector(
@@ -1220,7 +1220,7 @@ export default function ThreadPage({
                 value={newMessage}
                 onChange={setNewMessage}
                 onSubmit={handleSubmitMessage}
-                placeholder="Ask Suna anything..."
+                placeholder="Ask OMNI anything..."
                 loading={isSending}
                 disabled={isSending || agentStatus === 'running' || agentStatus === 'connecting'}
                 isAgentRunning={agentStatus === 'running' || agentStatus === 'connecting'}
@@ -1276,10 +1276,10 @@ export default function ThreadPage({
             <DialogHeader>
               <DialogTitle className="flex items-center">
                 <Crown className="h-5 w-5 mr-2 text-primary" />
-                Unlock the Full Suna Experience
+                Unlock the Full OMNI Operator Experience
               </DialogTitle>
               <DialogDescription>
-                You're currently using Suna's free tier with limited capabilities.
+                You're currently using OMNI Operator's free tier with limited capabilities.
                 Upgrade now to access our most powerful AI model.
               </DialogDescription>
             </DialogHeader>

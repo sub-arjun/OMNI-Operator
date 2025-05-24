@@ -298,6 +298,7 @@ async def start_agent(
         enable_thinking=body.enable_thinking, reasoning_effort=body.reasoning_effort,
         stream=body.stream, enable_context_manager=body.enable_context_manager
     )
+    logger.info(f"Dispatched background task for agent run: {agent_run_id}")
 
     return {"agent_run_id": agent_run_id, "status": "running"}
 
@@ -742,6 +743,7 @@ async def initiate_agent_with_files(
             enable_thinking=enable_thinking, reasoning_effort=reasoning_effort,
             stream=stream, enable_context_manager=enable_context_manager
         )
+        logger.info(f"Dispatched background task for agent run: {agent_run_id}")
 
         return {"thread_id": thread_id, "agent_run_id": agent_run_id}
 

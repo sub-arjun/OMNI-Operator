@@ -154,7 +154,10 @@ export const MessageInput = forwardRef<HTMLTextAreaElement, MessageInputProps>(
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>The free tier is severely limited by inferior models; upgrade to experience the true full Suna experience.</p>
+                  <div className="space-y-1">
+                    <p className="text-red-600 font-medium">Free tier limit reached!</p>
+                    <p>The free tier is severely limited by inferior models; upgrade to experience the true full OMNI experience.</p>
+                  </div>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
