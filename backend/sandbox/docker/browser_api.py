@@ -621,7 +621,7 @@ class BrowserAutomation:
             
             # Wait for network to be idle and DOM to be stable
             try:
-                await page.wait_for_load_state("networkidle", timeout=60000)  # Increased timeout to 60s
+                await page.wait_for_load_state("networkidle", timeout=10000)  # Reduced from 60s to 10s
             except Exception as e:
                 print(f"Warning: Network idle timeout, proceeding anyway: {e}")
             
@@ -633,7 +633,7 @@ class BrowserAutomation:
                 type='jpeg',
                 quality=60,
                 full_page=False,
-                timeout=60000,  # Increased timeout to 60s
+                timeout=30000,  # Reduced from 60s to 30s
                 scale='device'  # Use device scale factor
             )
             
@@ -788,7 +788,7 @@ class BrowserAutomation:
         try:
             page = await self.get_current_page()
             await page.goto(action.url, wait_until="domcontentloaded")
-            await page.wait_for_load_state("networkidle", timeout=10000)
+            await page.wait_for_load_state("networkidle", timeout=5000)
             
             # Get updated state after action
             dom_state, screenshot, elements, metadata = await self.get_updated_browser_state(f"navigate_to({action.url})")
