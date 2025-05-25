@@ -289,9 +289,7 @@ class BrowserAutomation:
         self.screenshot_dir = os.path.join(os.getcwd(), "screenshots")
         os.makedirs(self.screenshot_dir, exist_ok=True)
         
-        # Register routes
-        self.router.on_startup.append(self.startup)
-        self.router.on_shutdown.append(self.shutdown)
+        # Register routes (removed startup/shutdown as they're handled by FastAPI now)
         
         # Basic navigation
         self.router.post("/automation/navigate_to")(self.navigate_to)
@@ -328,15 +326,31 @@ class BrowserAutomation:
 
     async def startup(self):
         """Initialize the browser instance on startup"""
+        # Check if browser is already initialized
+        if self.browser:
+            print("Browser already initialized, skipping startup")
+            return
+            
         try:
             print("Starting browser initialization...")
             playwright = await async_playwright().start()
             print("Playwright started, launching browser...")
             
-            # Use non-headless mode for testing with slower timeouts
+            # Use headless mode in production for faster startup
             launch_options = {
-                "headless": False,
-                "timeout": 60000
+                "headless": True,  # Changed to True for production
+                "timeout": 30000,  # Reduced from 60000
+                "args": [
+                    "--disable-blink-features=AutomationControlled",
+                    "--no-sandbox",
+                    "--disable-setuid-sandbox",
+                    "--disable-dev-shm-usage",
+                    "--disable-gpu",
+                    "--no-first-run",
+                    "--no-default-browser-check",
+                    "--disable-features=TranslateUI",
+                    "--disable-backgrounding-occluded-windows"
+                ]
             }
             
             try:
@@ -346,25 +360,38 @@ class BrowserAutomation:
                 print(f"Failed to launch browser: {browser_error}")
                 # Try with minimal options
                 print("Retrying with minimal options...")
-                launch_options = {"timeout": 90000}
+                launch_options = {
+                    "headless": True,
+                    "timeout": 45000,
+                    "args": ["--no-sandbox", "--disable-setuid-sandbox"]
+                }
                 self.browser = await playwright.chromium.launch(**launch_options)
                 print("Browser launched with minimal options")
 
+            # Create initial page without navigation
             try:
-                await self.get_current_page()
-                print("Found existing page, using it")
-                self.current_page_index = 0
-            except Exception as page_error:
-                print(f"Error finding existing page, creating new one. ( {page_error})")
-                page = await self.browser.new_page(viewport={'width': 1024, 'height': 768})
-                print("New page created successfully")
-                self.pages.append(page)
-                self.current_page_index = 0
-                # Navigate directly to google.com instead of about:blank
-                await page.goto("https://www.google.com", wait_until="domcontentloaded", timeout=30000)
-                print("Navigated to google.com")
+                # Check if there are existing pages
+                pages = self.browser.pages
+                if pages:
+                    print(f"Found {len(pages)} existing pages, using first one")
+                    page = pages[0]
+                    self.pages = [page]
+                else:
+                    print("Creating new page")
+                    page = await self.browser.new_page(viewport={'width': 1280, 'height': 768})
+                    self.pages = [page]
                 
+                self.current_page_index = 0
                 print("Browser initialization completed successfully")
+                
+            except Exception as page_error:
+                print(f"Error setting up initial page: {page_error}")
+                # Create a new page as fallback
+                page = await self.browser.new_page(viewport={'width': 1280, 'height': 768})
+                self.pages = [page]
+                self.current_page_index = 0
+                print("Created new page as fallback")
+                
         except Exception as e:
             print(f"Browser startup error: {str(e)}")
             traceback.print_exc()
@@ -374,9 +401,13 @@ class BrowserAutomation:
         """Clean up browser instance on shutdown"""
         if self.browser:
             await self.browser.close()
-    
+
     async def get_current_page(self) -> Page:
         """Get the current active page"""
+        # Ensure browser is initialized
+        if not self.browser:
+            await self.startup()
+            
         if not self.pages:
             raise HTTPException(status_code=500, detail="No browser pages available")
         return self.pages[self.current_page_index]
@@ -686,9 +717,6 @@ class BrowserAutomation:
         Returns a tuple of (dom_state, screenshot, elements, metadata)
         """
         try:
-            # Wait a moment for any potential async processes to settle
-            await asyncio.sleep(0.5)
-            
             # Get updated state
             dom_state = await self.get_current_dom_state()
             screenshot = await self.take_screenshot()
@@ -1820,6 +1848,26 @@ automation_service = BrowserAutomation()
 
 # Create API app
 api_app = FastAPI()
+
+@api_app.on_event("startup")
+async def startup_event():
+    """Initialize browser on API startup"""
+    try:
+        await automation_service.startup()
+        print("Browser pre-initialized on API startup")
+    except Exception as e:
+        print(f"Warning: Failed to pre-initialize browser: {e}")
+        # Don't fail the API startup if browser init fails
+        # It will be initialized on first request
+
+@api_app.on_event("shutdown")
+async def shutdown_event():
+    """Cleanup browser on API shutdown"""
+    try:
+        await automation_service.shutdown()
+        print("Browser cleaned up on API shutdown")
+    except Exception as e:
+        print(f"Warning: Error during browser cleanup: {e}")
 
 @api_app.get("/api")
 async def health_check():

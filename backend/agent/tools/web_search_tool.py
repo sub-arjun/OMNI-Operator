@@ -322,7 +322,7 @@ class SandboxWebSearchTool(SandboxToolsBase):
                 
                 # Use longer timeout and retry logic for more reliability
                 max_retries = 3
-                timeout_seconds = 120
+                timeout_seconds = 60  # Reduced from 120 to 60 seconds
                 retry_count = 0
                 
                 while retry_count < max_retries:
@@ -342,10 +342,18 @@ class SandboxWebSearchTool(SandboxToolsBase):
                         retry_count += 1
                         logging.warning(f"Request timed out (attempt {retry_count}/{max_retries}): {str(timeout_err)}")
                         if retry_count >= max_retries:
-                            raise Exception(f"Request timed out after {max_retries} attempts with {timeout_seconds}s timeout")
-                        # Exponential backoff
-                        logging.info(f"Waiting {2 ** retry_count}s before retry")
-                        await asyncio.sleep(2 ** retry_count)
+                            # Return a more user-friendly error
+                            raise Exception(f"The webpage took too long to load. This often happens with complex or slow websites. Consider using the browser tool instead for this URL.")
+                        # Exponential backoff with shorter delays
+                        wait_time = min(2 ** retry_count, 10)  # Cap at 10 seconds
+                        logging.info(f"Waiting {wait_time}s before retry")
+                        await asyncio.sleep(wait_time)
+                    except httpx.HTTPStatusError as http_err:
+                        if http_err.response.status_code == 408:
+                            # Request timeout from server
+                            raise Exception(f"The webpage at {url} took too long to respond. Consider using the browser tool for better results.")
+                        else:
+                            raise http_err
                     except Exception as e:
                         # Don't retry on non-timeout errors
                         logging.error(f"Error during scraping: {str(e)}")

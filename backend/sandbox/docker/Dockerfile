@@ -100,6 +100,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . /app
 COPY server.py /app/server.py
 COPY browser_api.py /app/browser_api.py
+COPY start_browser.sh /app/start_browser.sh
+RUN chmod +x /app/start_browser.sh
 
 # Install Playwright and browsers with system dependencies
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
